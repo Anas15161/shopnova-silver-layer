@@ -1,0 +1,49 @@
+table_name: "orders"
+version: "1.0.0"
+
+rules:
+  # 1. Completeness
+  - name: "order_id_not_null"
+    dimension: "completeness"
+    condition: "order_id IS NOT NULL"
+    severity: "ERROR"
+    description: "La clé primaire order_id ne doit pas être nulle"
+
+  - name: "customer_id_not_null"
+    dimension: "completeness"
+    condition: "customer_id IS NOT NULL"
+    severity: "ERROR"
+    description: "Toute commande doit être rattachée à un client"
+
+  - name: "created_at_not_null"
+    dimension: "completeness"
+    condition: "created_at IS NOT NULL"
+    severity: "ERROR"
+    description: "La date de création de la commande est obligatoire"
+
+  # 2. Validity
+  - name: "valid_status"
+    dimension: "validity"
+    condition: "status IN ('pending', 'paid', 'shipped', 'delivered', 'cancelled', 'refunded')"
+    severity: "ERROR"
+    description: "Le statut doit appartenir à la nomenclature officielle"
+
+  - name: "positive_total_amount"
+    dimension: "validity"
+    condition: "is_deleted = true OR (total_amount IS NOT NULL AND total_amount >= 0)"
+    severity: "ERROR"
+    description: "Le montant total doit être positif ou nul"
+
+  # 3. Consistency
+  - name: "chronological_consistency"
+    dimension: "consistency"
+    condition: "updated_at IS NULL OR updated_at >= created_at"
+    severity: "ERROR"
+    description: "La date de mise à jour ne peut pas être antérieure à la création"
+
+  # 4. Accuracy
+  - name: "realistic_amount"
+    dimension: "accuracy"
+    condition: "is_deleted = true OR total_amount <= 500000.00"
+    severity: "WARNING"
+    description: "Détection des montants aberrants (> 500 000 MAD/EUR)"

@@ -1,0 +1,23 @@
+table_name: "customers"
+version: "1.0.0"
+
+rules:
+  # 1. Completeness
+  - name: "customer_id_not_null"
+    dimension: "completeness"
+    condition: "customer_id IS NOT NULL"
+    severity: "ERROR"
+    description: "L'identifiant client ne doit pas être nul"
+
+  - name: "name_not_null"
+    dimension: "completeness"
+    condition: "first_name IS NOT NULL AND last_name IS NOT NULL"
+    severity: "ERROR"
+    description: "Le prénom et le nom sont obligatoires"
+
+  # 2. Validity
+  - name: "valid_email_format"
+    dimension: "validity"
+    condition: "email RLIKE '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'"
+    severity: "ERROR"
+    description: "L'adresse email doit avoir une structure syntaxique valide"

@@ -1,0 +1,23 @@
+table_name: "products"
+version: "1.0.0"
+
+rules:
+  # 1. Completeness
+  - name: "product_id_not_null"
+    dimension: "completeness"
+    condition: "product_id IS NOT NULL"
+    severity: "ERROR"
+    description: "L'identifiant produit ne doit pas être nul"
+
+  # 2. Validity
+  - name: "positive_price"
+    dimension: "validity"
+    condition: "is_deleted = true OR (price IS NOT NULL AND price >= 0)"
+    severity: "ERROR"
+    description: "Le prix unitaire doit être positif ou nul"
+
+  - name: "positive_stock"
+    dimension: "validity"
+    condition: "is_deleted = true OR (stock_quantity IS NOT NULL AND stock_quantity >= 0)"
+    severity: "ERROR"
+    description: "La quantité en stock doit être positive ou nulle"
