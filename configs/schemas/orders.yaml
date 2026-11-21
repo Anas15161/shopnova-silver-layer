@@ -1,0 +1,49 @@
+table_name: "orders"
+version: "1.0.0"
+primary_key: "order_id"
+partition_column: "created_at"
+partition_granularity: "days"
+allow_schema_evolution: false
+
+columns:
+  - name: "order_id"
+    source_fields: ["after.order_id", "before.order_id", "order_id"]
+    type: "bigint"
+    required: true
+    description: "Identifiant unique de la commande (grain de la table)"
+
+  - name: "customer_id"
+    source_fields: ["after.customer_id", "before.customer_id", "customer_id"]
+    type: "bigint"
+    required: true
+    description: "Identifiant du client associé"
+
+  - name: "status"
+    source_fields: ["after.status", "status"]
+    type: "string"
+    required: true
+    description: "Statut courant (pending, paid, shipped, cancelled, refunded)"
+
+  - name: "total_amount"
+    source_fields: ["after.total_amount", "total_amount"]
+    type: "decimal(12,2)"
+    required: true
+    description: "Montant total de la commande"
+
+  - name: "created_at"
+    source_fields: ["after.created_at", "created_at"]
+    type: "timestamp"
+    required: true
+    description: "Date et heure de création de la commande"
+
+  - name: "updated_at"
+    source_fields: ["after.updated_at", "updated_at"]
+    type: "timestamp"
+    required: false
+    description: "Date et heure de dernière modification"
+
+cdc_metadata:
+  enabled: true
+  op_field: "op"
+  lsn_field: "source.lsn"
+  ts_ms_field: "ts_ms"

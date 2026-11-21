@@ -1,0 +1,54 @@
+table_name: "customers"
+version: "1.0.0"
+primary_key: "customer_id"
+partition_column: null
+allow_schema_evolution: false
+
+columns:
+  - name: "customer_id"
+    source_fields: ["after.customer_id", "before.customer_id", "customer_id"]
+    type: "bigint"
+    required: true
+    description: "Identifiant unique du client"
+
+  - name: "first_name"
+    source_fields: ["after.first_name", "first_name"]
+    type: "string"
+    required: true
+    description: "Prénom du client"
+
+  - name: "last_name"
+    source_fields: ["after.last_name", "last_name"]
+    type: "string"
+    required: true
+    description: "Nom de famille du client"
+
+  - name: "email"
+    source_fields: ["after.email", "email"]
+    type: "string"
+    required: true
+    description: "Adresse email de contact"
+
+  - name: "phone"
+    source_fields: ["after.phone", "phone"]
+    type: "string"
+    required: false
+    description: "Numéro de téléphone"
+
+  - name: "city"
+    source_fields: ["after.city", "city"]
+    type: "string"
+    required: false
+    description: "Ville de résidence"
+
+  - name: "created_at"
+    source_fields: ["after.created_at", "created_at"]
+    type: "timestamp"
+    required: true
+    description: "Date d'inscription du client"
+
+cdc_metadata:
+  enabled: true
+  op_field: "op"
+  lsn_field: "source.lsn"
+  ts_ms_field: "ts_ms"

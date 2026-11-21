@@ -1,4 +1,4 @@
-.PHONY: help setup lint test format clean docker-up docker-down docker-test test-adapters docker-logs
+.PHONY: help setup lint test format clean docker-up docker-down docker-test test-adapters test-schemas docker-logs
 
 VENV = .venv
 PYTHON = $(VENV)/bin/python
@@ -19,6 +19,7 @@ help:
 	@echo "  make docker-down    - Arrêter les conteneurs Docker"
 	@echo "  make docker-test    - Exécuter le test de santé Spark + Iceberg + S3"
 	@echo "  make test-adapters  - Exécuter les tests E2E des adaptateurs sources (CSV, JSON CDC, Parquet, Iceberg)"
+	@echo "  make test-schemas   - Exécuter les tests E2E de validation et mapping de schémas"
 	@echo "  make docker-logs    - Afficher les logs des services Docker"
 	@echo "  make clean          - Nettoyer les caches Python et temporaires"
 
@@ -50,6 +51,9 @@ docker-test:
 
 test-adapters:
 	docker exec shopnova-spark-iceberg python3 /home/iceberg/scripts/test_adapters_e2e.py
+
+test-schemas:
+	docker exec shopnova-spark-iceberg python3 /home/iceberg/scripts/test_schema_management_e2e.py
 
 docker-logs:
 	$(DOCKER_COMPOSE) logs -f

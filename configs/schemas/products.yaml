@@ -1,0 +1,48 @@
+table_name: "products"
+version: "1.0.0"
+primary_key: "product_id"
+partition_column: null
+allow_schema_evolution: false
+
+columns:
+  - name: "product_id"
+    source_fields: ["after.product_id", "before.product_id", "product_id"]
+    type: "bigint"
+    required: true
+    description: "Identifiant unique du produit"
+
+  - name: "name"
+    source_fields: ["after.name", "name"]
+    type: "string"
+    required: true
+    description: "Nom commercial du produit"
+
+  - name: "category"
+    source_fields: ["after.category", "category"]
+    type: "string"
+    required: true
+    description: "Catégorie du produit"
+
+  - name: "price"
+    source_fields: ["after.price", "price"]
+    type: "decimal(10,2)"
+    required: true
+    description: "Prix unitaire"
+
+  - name: "stock_quantity"
+    source_fields: ["after.stock_quantity", "stock_quantity"]
+    type: "integer"
+    required: true
+    description: "Quantité en stock"
+
+  - name: "created_at"
+    source_fields: ["after.created_at", "created_at"]
+    type: "timestamp"
+    required: true
+    description: "Date de création de la référence"
+
+cdc_metadata:
+  enabled: true
+  op_field: "op"
+  lsn_field: "source.lsn"
+  ts_ms_field: "ts_ms"
