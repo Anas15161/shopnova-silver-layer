@@ -1,0 +1,99 @@
+services:
+  minio:
+    image: pgsty/minio:latest
+    container_name: shopnova-minio
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DOMAIN=minio
+    networks:
+      shopnova-net:
+        aliases:
+          - minio
+          - warehouse.minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: ["server", "/data", "--console-address", ":9001"]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mc-init:
+    image: pgsty/mc:latest
+    container_name: shopnova-mc-init
+    depends_on:
+      minio:
+        condition: service_started
+    networks:
+      - shopnova-net
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Attente de la disponibilité de MinIO...';
+      until mc alias set local http://minio:9000 admin password; do
+        sleep 1;
+      done;
+      echo 'MinIO prêt. Création des buckets...';
+      mc mb -p local/bronze local/silver local/quarantine local/warehouse;
+      mc anonymous set download local/bronze;
+      echo 'Buckets créés avec succès :';
+      mc ls local;
+      exit 0;
+      "
+
+  iceberg-rest:
+    image: apache/iceberg-rest-fixture:latest
+    container_name: shopnova-iceberg-rest
+    depends_on:
+      - minio
+    networks:
+      shopnova-net:
+        aliases:
+          - rest
+          - iceberg-rest
+    ports:
+      - "8181:8181"
+    environment:
+      - JAVA_TOOL_OPTIONS=-Djetty.httpConfig.uriCompliance=UNSAFE
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+      - CATALOG_WAREHOUSE=s3://warehouse/
+      - CATALOG_IO__IMPL=org.apache.iceberg.aws.s3.S3FileIO
+      - CATALOG_S3_ENDPOINT=http://minio:9000
+
+  spark-iceberg:
+    image: tabulario/spark-iceberg:latest
+    container_name: shopnova-spark-iceberg
+    depends_on:
+      - iceberg-rest
+      - minio
+    networks:
+      - shopnova-net
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+    volumes:
+      - ./src:/home/iceberg/src
+      - ./configs:/home/iceberg/configs
+      - ./tests:/home/iceberg/tests
+      - ./docker/spark/scripts:/home/iceberg/scripts
+      - ./docker/spark/conf/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
+    ports:
+      - "8888:8888"   # Jupyter Notebook & Lab
+      - "8080:8080"   # Interface Web Spark Master
+      - "4040:4040"   # Spark Driver Web UI
+
+volumes:
+  minio_data:
+    name: shopnova_minio_data
+
+networks:
+  shopnova-net:
+    name: shopnova_network
+    driver: bridge
