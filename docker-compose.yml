@@ -78,10 +78,12 @@ services:
       - AWS_ACCESS_KEY_ID=admin
       - AWS_SECRET_ACCESS_KEY=password
       - AWS_REGION=us-east-1
+      - PYTHONPATH=/opt/spark/python:/opt/spark/python/lib/py4j-0.10.9.7-src.zip:/home/iceberg
     volumes:
       - ./src:/home/iceberg/src
       - ./configs:/home/iceberg/configs
       - ./tests:/home/iceberg/tests
+      - ./data:/home/iceberg/data
       - ./docker/spark/scripts:/home/iceberg/scripts
       - ./docker/spark/conf/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
     ports:
