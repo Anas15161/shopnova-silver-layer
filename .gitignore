@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Data directories & Storage (NEVER commit data or Iceberg data files)
+data/
+*.parquet
+*.orc
+*.avro
+*.csv
+*.json
+*.tsv
+metastore_db/
+derby.log
+spark-warehouse/
+
+# Environment Variables & Credentials
+.env
+*.env.local
+*.pem
+*.key
+credentials.json
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Large local documentation assets (PDFs & raw assets to avoid GitHub repository bloat)
+*.pdf
